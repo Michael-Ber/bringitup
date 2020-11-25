@@ -1,6 +1,41 @@
-import Slider from "./modules/slider.js";
+import MainSlider from "./modules/slider/main-slider.js";
+import SliderMini from "./modules/slider/slider-mini";
+import VideoPlayer from "./modules/videoPlayer";
 
 window.addEventListener('DOMContentLoaded', () => {
-    const slider = new Slider('.page', '.next');
+
+    const slider = new MainSlider({container: '.page', btns: '.next'});
     slider.render();
+
+    const showUpSlider = new SliderMini({
+		container: '.showup__content-slider',
+		prev: '.showup__prev',
+		next: '.showup__next',
+		activeClass: 'card-active',
+		animate: true
+	});
+	showUpSlider.init();
+
+	const modulesSlider = new SliderMini({
+		container: '.modules__content-slider',
+		prev: '.modules__info-btns .slick-prev',
+		next: '.modules__info-btns .slick-next',
+		activeClass: 'card-active',
+		animate: true,
+		autoplay: true
+	});
+	modulesSlider.init();
+
+	const feedSlider = new SliderMini({
+		container: '.feed__slider',
+		prev: '.feed__slider .slick-prev',
+		next: '.feed__slider .slick-next',
+		activeClass: 'feed__item-active'
+	});
+	feedSlider.init();
+
+
+   
+    const player = new VideoPlayer('.showup .play', '.overlay');
+    player.init();
 });
