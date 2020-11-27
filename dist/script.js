@@ -3064,7 +3064,9 @@ function (_Slider) {
       this.next.addEventListener('click', function () {
         _this3.container.appendChild(_this3.slides[0]);
 
-        _this3.slides.shift(_this3.slides.push());
+        _this3.nextArrElem(_this3.slides);
+
+        console.log(_this3.slides);
 
         _this3.decorize();
       });
@@ -3087,8 +3089,22 @@ function (_Slider) {
 
         _this4.container.insertBefore(_this4.slides[active], _this4.slides[0]);
 
+        _this4.prevArrElem(_this4.slides);
+
         _this4.decorize();
       });
+    }
+  }, {
+    key: "nextArrElem",
+    value: function nextArrElem(arr) {
+      var firstElem = arr.shift();
+      arr.push(firstElem);
+    }
+  }, {
+    key: "prevArrElem",
+    value: function prevArrElem(arr) {
+      var lastElem = arr.pop();
+      arr.unshift(lastElem);
     }
   }]);
 

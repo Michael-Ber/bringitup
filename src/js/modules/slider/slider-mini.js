@@ -49,7 +49,8 @@ export default class SliderMini extends Slider {
     nextSlide() {
         this.next.addEventListener('click', () => {
             this.container.appendChild(this.slides[0]);
-            this.slides.shift(this.slides.push());
+            this.nextArrElem(this.slides);
+            console.log(this.slides);
             this.decorize();
         });
         if(this.autoplay) {
@@ -64,8 +65,18 @@ export default class SliderMini extends Slider {
         this.prev.addEventListener('click', () => {
             let active = this.slides.length - 1;
             this.container.insertBefore(this.slides[active], this.slides[0]);
+            this.prevArrElem(this.slides);
             this.decorize();
         });
+    }
+
+    nextArrElem(arr) {
+        let firstElem = arr.shift();
+        arr.push(firstElem);
+    }
+    prevArrElem(arr) {
+        let lastElem = arr.pop();
+        arr.unshift(lastElem);
     }
 
 }
