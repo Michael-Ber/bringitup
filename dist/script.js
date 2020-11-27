@@ -2902,9 +2902,10 @@ function (_Slider) {
 
       this.slides.forEach(function (slide) {
         slide.style.display = 'none';
+        slide.classList.remove('actual');
       });
       this.slides[this.slideIndex - 1].style.display = 'block';
-      this.slides[this.slideIndex - 1].classList.add('animated', 'fadeIn');
+      this.slides[this.slideIndex - 1].classList.add('animated', 'fadeIn', 'actual');
     }
   }, {
     key: "plusSlide",
@@ -3014,20 +3015,30 @@ function (_Slider) {
   _createClass(SliderMini, [{
     key: "init",
     value: function init() {
+      var _this = this;
+
       this.container.style.cssText = "\n            display: flex;\n            flex-wrap: wrap;\n            overflow: hidden;\n            align-items: flex-start;\n        ";
       this.bindTriggers();
       this.decorize();
-      this.nextSlide();
+
+      if (this.autoplay) {
+        this.container.addEventListener('mouseover', function () {
+          clearInterval(_this.timerID);
+        });
+        this.container.addEventListener('mouseout', function () {
+          _this.nextSlide();
+        });
+      }
     }
   }, {
     key: "decorize",
     value: function decorize() {
-      var _this = this;
+      var _this2 = this;
 
       this.slides.forEach(function (slide) {
-        slide.classList.remove(_this.activeClass);
+        slide.classList.remove(_this2.activeClass);
 
-        if (_this.animate) {
+        if (_this2.animate) {
           slide.querySelector('.card__title').style.opacity = '0.4';
           slide.querySelector('.card__controls-arrow').style.opacity = '0';
         }
@@ -3042,18 +3053,8 @@ function (_Slider) {
   }, {
     key: "bindTriggers",
     value: function bindTriggers() {
-      var _this2 = this;
-
-      this.next.addEventListener('click', function () {
-        return _this2.nextSlide();
-      });
-      this.prev.addEventListener('click', function () {
-        var active = _this2.slides.length - 1;
-
-        _this2.container.insertBefore(_this2.slides[active], _this2.slides[0]);
-
-        _this2.decorize();
-      });
+      this.nextSlide();
+      this.prevSlide();
     }
   }, {
     key: "nextSlide",
@@ -3062,6 +3063,8 @@ function (_Slider) {
 
       this.next.addEventListener('click', function () {
         _this3.container.appendChild(_this3.slides[0]);
+
+        _this3.slides.shift(_this3.slides.push());
 
         _this3.decorize();
       });
@@ -3075,22 +3078,17 @@ function (_Slider) {
       }
     }
   }, {
-    key: "opacityTrue",
-    value: function opacityTrue(n) {
-      this.slides[n].lastElementChild.style.opacity = '1';
-      this.slides[n].firstElementChild.lastElementChild.style.opacity = '1';
+    key: "prevSlide",
+    value: function prevSlide() {
+      var _this4 = this;
 
-      if (this.slides[n].parentNode.classList.contains('modules__content-slider')) {
-        this.slides[n].lastElementChild.children.forEach(function (child) {
-          child.firstElementChild.style.opacity = '1';
-        });
-      }
-    }
-  }, {
-    key: "opacityFalse",
-    value: function opacityFalse(elem) {
-      elem.lastElementChild.style.opacity = '0.4';
-      elem.firstElementChild.lastElementChild.style.opacity = '0';
+      this.prev.addEventListener('click', function () {
+        var active = _this4.slides.length - 1;
+
+        _this4.container.insertBefore(_this4.slides[active], _this4.slides[0]);
+
+        _this4.decorize();
+      });
     }
   }]);
 
@@ -3111,9 +3109,15 @@ function (_Slider) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Slider; });
+/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__);
+
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Slider = function Slider() {
+  var _this = this;
+
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$container = _ref.container,
       container = _ref$container === void 0 ? null : _ref$container,
@@ -3132,7 +3136,12 @@ var Slider = function Slider() {
 
   // второй объет для того, чтобы не было ошибки при вызове пустого класса
   this.container = document.querySelector(container);
-  this.slides = this.container.children;
+  this.slides = [];
+  this.container.children.forEach(function (child) {
+    if (child.tagName !== 'BUTTON') {
+      _this.slides.push(child);
+    }
+  });
   this.btns = document.querySelectorAll(btns);
   this.prev = document.querySelector(prev);
   this.next = document.querySelector(next);
