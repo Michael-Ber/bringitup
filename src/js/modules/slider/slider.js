@@ -8,12 +8,13 @@ export default class Slider {
         autoplay
         } = {}) { // второй объет для того, чтобы не было ошибки при вызове пустого класса
         this.container = document.querySelector(container);
-        this.slides = [];
-        this.container.children.forEach(child => {
-            if(child.tagName !== 'BUTTON') {
-                this.slides.push(child);
-            }
-        });
+        this.slides = this.container.children;
+        // this.slides = [];
+        // this.container.children.forEach(child => {
+        //     if(child.tagName !== 'BUTTON') {
+        //         this.slides.push(child);
+        //     }
+        // });
         this.btns = document.querySelectorAll(btns);
         this.prev = document.querySelector(prev);
         this.next = document.querySelector(next);

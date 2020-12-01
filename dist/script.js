@@ -2763,6 +2763,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_slider_main_slider_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/slider/main-slider.js */ "./src/js/modules/slider/main-slider.js");
 /* harmony import */ var _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/slider/slider-mini */ "./src/js/modules/slider/slider-mini.js");
 /* harmony import */ var _modules_videoPlayer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/videoPlayer */ "./src/js/modules/videoPlayer.js");
+/* harmony import */ var _modules_difference__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/difference */ "./src/js/modules/difference.js");
+
 
 
 
@@ -2796,9 +2798,87 @@ window.addEventListener('DOMContentLoaded', function () {
     activeClass: 'feed__item-active'
   });
   feedSlider.init();
+  new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"]('.officerold', '.officernew', '.officer__card-item').init();
   var player = new _modules_videoPlayer__WEBPACK_IMPORTED_MODULE_2__["default"]('.showup .play', '.overlay');
   player.init();
 });
+
+/***/ }),
+
+/***/ "./src/js/modules/difference.js":
+/*!**************************************!*\
+  !*** ./src/js/modules/difference.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Difference; });
+/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Difference =
+/*#__PURE__*/
+function () {
+  function Difference(oldOfficer, newOfficer, items) {
+    _classCallCheck(this, Difference);
+
+    this.oldOfficer = document.querySelector(oldOfficer);
+    this.newOfficer = document.querySelector(newOfficer);
+    this.itemsOld = this.oldOfficer.querySelectorAll(items);
+    this.itemsNew = this.newOfficer.querySelectorAll(items);
+    this.counterOld = 0;
+    this.counterNew = 0;
+  }
+
+  _createClass(Difference, [{
+    key: "bindTriggers",
+    value: function bindTriggers(nodeElem, counter, items) {
+      nodeElem.querySelector('.plus').addEventListener('click', function () {
+        if (counter < items.length - 2) {
+          items[counter].style.display = 'flex';
+          items[counter].classList.add('fadeIn');
+          counter++;
+        } else {
+          items[counter].style.display = 'flex';
+          items[counter].classList.add('fadeIn');
+          items[items.length - 1].remove();
+        }
+      });
+    }
+  }, {
+    key: "hideItems",
+    value: function hideItems(nodeElem) {
+      nodeElem.forEach(function (item, i, arr) {
+        if (i !== arr.length - 1) {
+          item.style.display = 'none';
+          item.classList.add('animated');
+          item.classList.remove('fadeIn');
+        }
+      });
+    }
+  }, {
+    key: "init",
+    value: function init() {
+      this.hideItems(this.itemsOld);
+      this.hideItems(this.itemsNew);
+      this.bindTriggers(this.oldOfficer, this.counterOld, this.itemsOld);
+      this.bindTriggers(this.newOfficer, this.counterNew, this.itemsNew);
+    }
+  }]);
+
+  return Difference;
+}();
+
+
 
 /***/ }),
 
@@ -3026,7 +3106,7 @@ function (_Slider) {
           clearInterval(_this.timerID);
         });
         this.container.addEventListener('mouseout', function () {
-          _this.nextSlide();
+          _this.nextByInterval();
         });
       }
     }
@@ -3062,22 +3142,26 @@ function (_Slider) {
       var _this3 = this;
 
       this.next.addEventListener('click', function () {
-        _this3.container.appendChild(_this3.slides[0]);
+        for (var i = 1; i < _this3.slides.length - 1; i++) {
+          if (_this3.slides[i].tagName !== 'BUTTON') {
+            _this3.container.appendChild(_this3.slides[0]);
 
-        _this3.nextArrElem(_this3.slides);
+            _this3.decorize();
 
-        console.log(_this3.slides);
+            break;
+          } else {
+            _this3.container.appendChild(_this3.slides[i]);
 
-        _this3.decorize();
+            i--;
+          }
+        } // this.container.appendChild(this.slides[0]);
+        // this.nextArrElem(this.slides);
+        // this.decorize();
+
       });
-
-      if (this.autoplay) {
-        this.timerID = setInterval(function () {
-          _this3.container.appendChild(_this3.slides[0]);
-
-          _this3.decorize();
-        }, 5000);
-      }
+      document.querySelector('.difference .next').addEventListener('click', function () {
+        _this3.nextByInterval();
+      });
     }
   }, {
     key: "prevSlide",
@@ -3085,13 +3169,21 @@ function (_Slider) {
       var _this4 = this;
 
       this.prev.addEventListener('click', function () {
-        var active = _this4.slides.length - 1;
+        for (var i = _this4.slides.length - 1; i > 0; i--) {
+          if (_this4.slides[i].tagName !== 'BUTTON') {
+            var active = _this4.slides[i];
 
-        _this4.container.insertBefore(_this4.slides[active], _this4.slides[0]);
+            _this4.container.insertBefore(active, _this4.slides[0]);
 
-        _this4.prevArrElem(_this4.slides);
+            _this4.decorize();
 
-        _this4.decorize();
+            break;
+          }
+        } // let active = this.slides.length - 1;
+        // this.container.insertBefore(this.slides[active], this.slides[0]);
+        // this.prevArrElem(this.slides);
+        // this.decorize();
+
       });
     }
   }, {
@@ -3105,6 +3197,20 @@ function (_Slider) {
     value: function prevArrElem(arr) {
       var lastElem = arr.pop();
       arr.unshift(lastElem);
+    }
+  }, {
+    key: "nextByInterval",
+    value: function nextByInterval() {
+      var _this5 = this;
+
+      if (this.autoplay) {
+        this.timerID = setInterval(function () {
+          _this5.container.appendChild(_this5.slides[0]); // this.nextArrElem(this.slides);
+
+
+          _this5.decorize();
+        }, 5000);
+      }
     }
   }]);
 
@@ -3125,15 +3231,9 @@ function (_Slider) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Slider; });
-/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
-/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_0__);
-
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Slider = function Slider() {
-  var _this = this;
-
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$container = _ref.container,
       container = _ref$container === void 0 ? null : _ref$container,
@@ -3152,12 +3252,13 @@ var Slider = function Slider() {
 
   // второй объет для того, чтобы не было ошибки при вызове пустого класса
   this.container = document.querySelector(container);
-  this.slides = [];
-  this.container.children.forEach(function (child) {
-    if (child.tagName !== 'BUTTON') {
-      _this.slides.push(child);
-    }
-  });
+  this.slides = this.container.children; // this.slides = [];
+  // this.container.children.forEach(child => {
+  //     if(child.tagName !== 'BUTTON') {
+  //         this.slides.push(child);
+  //     }
+  // });
+
   this.btns = document.querySelectorAll(btns);
   this.prev = document.querySelector(prev);
   this.next = document.querySelector(next);

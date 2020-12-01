@@ -19,7 +19,7 @@ export default class SliderMini extends Slider {
                 clearInterval(this.timerID);
             });
             this.container.addEventListener('mouseout', () => {
-                this.nextSlide();
+                this.nextByInterval();
             }); 
         }
         
@@ -48,25 +48,41 @@ export default class SliderMini extends Slider {
 
     nextSlide() {
         this.next.addEventListener('click', () => {
-            this.container.appendChild(this.slides[0]);
-            this.nextArrElem(this.slides);
-            console.log(this.slides);
-            this.decorize();
+            for(let i = 1; i < this.slides.length-1; i++) {
+                if(this.slides[i].tagName !== 'BUTTON') {
+                    this.container.appendChild(this.slides[0]);
+                    this.decorize();
+                    break;
+                }else {
+                    this.container.appendChild(this.slides[i]);
+                    i--;
+                }
+            }
+            
+            // this.container.appendChild(this.slides[0]);
+            // this.nextArrElem(this.slides);
+            // this.decorize();
         });
-        if(this.autoplay) {
-            this.timerID = setInterval(() => {
-                this.container.appendChild(this.slides[0]);
-                this.decorize();
-            }, 5000);
-        }
+        document.querySelector('.difference .next').addEventListener('click', () => {
+            this.nextByInterval();
+            
+        });
     }
 
     prevSlide() {
         this.prev.addEventListener('click', () => {
-            let active = this.slides.length - 1;
-            this.container.insertBefore(this.slides[active], this.slides[0]);
-            this.prevArrElem(this.slides);
-            this.decorize();
+            for(let i = this.slides.length-1; i > 0; i--) {
+                if(this.slides[i].tagName !== 'BUTTON') {
+                    let active = this.slides[i];
+                    this.container.insertBefore(active, this.slides[0]);
+                    this.decorize();
+                    break;
+                }
+            }
+            // let active = this.slides.length - 1;
+            // this.container.insertBefore(this.slides[active], this.slides[0]);
+            // this.prevArrElem(this.slides);
+            // this.decorize();
         });
     }
 
@@ -79,4 +95,13 @@ export default class SliderMini extends Slider {
         arr.unshift(lastElem);
     }
 
+    nextByInterval() {
+        if(this.autoplay) {
+            this.timerID = setInterval(() => {
+                this.container.appendChild(this.slides[0]);
+                // this.nextArrElem(this.slides);
+                this.decorize();
+            }, 5000);
+        }
+    }
 }
