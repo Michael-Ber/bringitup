@@ -6,22 +6,24 @@ export default class SliderMini extends Slider {
     }
 
     init() {
-        this.container.style.cssText = `
-            display: flex;
-            flex-wrap: wrap;
-            overflow: hidden;
-            align-items: flex-start;
-        `;
-        this.bindTriggers();
-        this.decorize();
-        if(this.autoplay) {
-            this.container.addEventListener('mouseover', () => {
-                clearInterval(this.timerID);
-            });
-            this.container.addEventListener('mouseout', () => {
-                this.nextByInterval();
-            }); 
-        }
+        try{
+            this.container.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                overflow: hidden;
+                align-items: flex-start;
+            `;
+            this.bindTriggers();
+            this.decorize();
+            if(this.autoplay) {
+                this.container.addEventListener('mouseover', () => {
+                    clearInterval(this.timerID);
+                });
+                this.container.addEventListener('mouseout', () => {
+                    this.nextByInterval();
+                }); 
+            }
+        }catch(e){}
         
     }
 
