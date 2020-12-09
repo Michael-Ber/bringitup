@@ -3,6 +3,8 @@ import SliderMini from "./modules/slider/slider-mini";
 import VideoPlayer from "./modules/videoPlayer";
 import Difference from "./modules/difference";
 import Form from "./modules/form";
+import Accordeon from "./modules/accordeon";
+import Download from "./modules/download";
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -41,10 +43,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	new Difference('.officerold', '.officernew', '.officer__card-item').init();
    
-    const player = new VideoPlayer('.showup .play', '.overlay');
-	player.init();
+	new VideoPlayer('.showup .play', '.overlay').init();
+	new VideoPlayer('.module__video-item .play', '.overlay').init();
 	
 	new Form('.join__evolution .form').init();
 	new Form('.schedule__form .form').init();
 
+	new Accordeon('.plus', '.msg').init();
+	new Download('.download').init();
 });

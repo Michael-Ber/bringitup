@@ -3,18 +3,34 @@ export default class VideoPlayer {
         this.btns = document.querySelectorAll(triggers);
         this.overlay = document.querySelector(overlay);
         this.close = this.overlay.querySelector('.close');
+        this.onPlayerStateChange = this.onPlayerStateChange.bind(this);
     }
 
     bindTriggers() {
-        this.btns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                if(document.querySelector('iframe#frame')) {
-                    this.overlay.style.display = 'flex';
-                }else {
-                    const path = btn.getAttribute('data-url');
-                    this.createPlayer(path);
+        this.btns.forEach((btn, i) => {
+            try {
+                const blockedElem = btn.closest('.module__video-item').nextElementSibling;
+
+                if(i % 2 == 0){
+                    blockedElem.setAttribute('data-disabled', 'true');
                 }
-                this.overlay.style.display = 'flex';
+            }catch(e) {}
+            
+            btn.addEventListener('click', () => {
+                if(!btn.closest('.module__video-item') || btn.closest('.module__video-item').getAttribute('data-disabled') !== 'true') { // первое условие чтобы не было ошибки на странице loan
+                    this.activeBtn = btn;
+                    if(document.querySelector('iframe#frame')) {
+                        this.overlay.style.display = 'flex';
+                        if(this.path !== btn.getAttribute('data-url')) {
+                            this.path = btn.getAttribute('data-url');
+                            this.player.loadVideoById({videoId: this.path});
+                        }
+                    }else {
+                        this.path = btn.getAttribute('data-url');
+                        this.createPlayer(this.path);
+                    }
+                    this.overlay.style.display = 'flex';
+                }
             });
         });
     }
@@ -26,19 +42,44 @@ export default class VideoPlayer {
     }
 
     init() {
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        this.bindTriggers();
-        this.bindCloseTrigger();
+        if(this.btns.length > 0) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            this.bindTriggers();
+            this.bindCloseTrigger();
+        }
     }
     createPlayer(url) {
         this.player = new YT.Player('frame', {
             height: '100%',
             width: '100%',
-            videoId: `${url}`
+            videoId: `${url}`,
+            events: {
+                'onStateChange': this.onPlayerStateChange
+              }
         });
+    }
+
+    onPlayerStateChange(event) {
+        try{
+            const blockedElem = this.activeBtn.closest('.module__video-item').nextElementSibling;
+            const playBtn = this.activeBtn.querySelector('svg').cloneNode(true);
+
+            if(event.data == 0) {
+                if(blockedElem.querySelector('.play__circle').classList.contains('closed')) {
+                    blockedElem.querySelector('.play__circle').classList.remove('closed');
+                    blockedElem.querySelector('svg').remove();
+                    blockedElem.querySelector('.play__circle').appendChild(playBtn);
+                    blockedElem.style.opacity = '1';
+                    blockedElem.style.filter = 'unset';
+                    blockedElem.querySelector('.play__text').textContent = 'play video';
+                    blockedElem.querySelector('.play__text').classList.remove('attention');
+                    blockedElem.setAttribute('data-disabled', 'false');
+                }
+            }
+        }catch(e){}
     }
 
 
